@@ -1,0 +1,24 @@
+#! /usr/bin/sh
+
+unset PYTHONPATH
+export TMPDIR=/vol/projects/mzoodsma/modular_demultiplexing_pipeline/tmp/ # Path to a tmp directory with enough free disk space
+source /home/mzoodsma/bin/snakemake_venv/bin/activate
+export PATH=$PATH:$PWD/config/
+
+if [[ $1 = 'dry' ]]; then
+  echo "Dry run"
+  snakemake --snakefile dmx.smk --use-conda --jobs 100 --latency-wait 100 --profile config/ -p -n
+
+elif [[ $1 = 'unlock' ]]; then
+  echo "Unlocking"
+  snakemake --snakefile dmx.smk --unlock
+
+elif [[ $1 = 'touch' ]]; then
+  echo "Touching"
+  snakemake --snakefile dmx.smk --jobs 1 --profile config/ --keep-going --touch
+
+else
+  echo "Normal run"
+  snakemake --snakefile dmx.smk --use-conda --jobs 100 --latency-wait 100 --profile config/ --keep-going
+
+fi

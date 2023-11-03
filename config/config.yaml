@@ -1,0 +1,31 @@
+cluster:
+  mkdir -p logs/{rule} &&
+  sbatch {resources.extra_options}
+    --parsable
+    --partition={resources.partition}
+    --qos={resources.qos}
+    --cpus-per-task={resources.cpus_per_task}
+    --mem={resources.mem}
+    --time={resources.time}
+    --job-name=smk_{rule}
+    --output=logs/{rule}/%j-%u-%x.out
+default-resources:
+  - account=mzoodsma
+  - partition=cpu
+  - qos=normal
+  - time='0:10:0'
+  - mem='1G'
+  - cpus_per_task=1
+  - extra_options=''
+scheduler: greedy
+use-conda: True
+local-cores: 1
+keep-going: False
+latency-wait: 100
+restart-times: 0
+printshellcmds: True
+cluster-cancel: 'scancel'
+cluster-status: 'slurm-status'
+rerun-incomplete: True
+max-jobs-per-second: 10
+max-status-checks-per-second: 1

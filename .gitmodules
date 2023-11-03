@@ -1,0 +1,18 @@
+[submodule "tools/AMULET"]
+	path = tools/AMULET
+	url = https://github.com/UcarLab/AMULET
+[submodule "tools/souporcell"]
+	path = tools/souporcell
+	url = git@github.com:wheaton5/souporcell.git
+[submodule "tools/freebayes"]
+	path = tools/freebayes
+	url = git@github.com:freebayes/freebayes.git
+[submodule "tools/demuxlet"]
+	path = tools/demuxlet
+	url = git@github.com:statgen/demuxlet.git
+[submodule "tools/scrublet"]
+	path = tools/scrublet
+	url = git@github.com:swolock/scrublet.git
+[submodule "tools/vireo"]
+	path = tools/vireo
+	url = git@github.com:single-cell-genetics/vireo.git

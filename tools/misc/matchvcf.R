@@ -53,10 +53,11 @@ doSum <- function(x) {
 
 # Matching
 counts <- matrix(0, nrow = length(refsamples), ncol = length(sc_samples), dimnames = list(refsamples, sc_samples))
+newvals <- c('1|1' = 2, '0|1' = 1, '1|0' = 1, '0|0' = 0, '.|.' = NA, '.|1' = NA, '1|.' = NA, '.|0' = NA, '0|.' = NA)
 
 for (sc_cluster in sc_samples) {
   for (refsample in refsamples) {
-# 
+#
 #     # Compare all SNPs at the same time
 #     # By comparing this way, all genotypes that are equal between reference and
 #     # souporcell are TRUE (=1), those that dont match are false (=0).
@@ -64,18 +65,23 @@ for (sc_cluster in sc_samples) {
 #     # SNPs with missing information are included in the sc_genotype, and will produce FALSE because they dont match.
 #     sc_genotype <- sc %>% pull(as.character(sc_cluster))
 #     ref_genotype <- ref  %>% pull(refsample)
-# 
+#
 #     counts[refsample, as.character(sc_cluster)] <- sum(sc_genotype == ref_genotype)
-# 
-#     
-#     
+#
+#
+#
     sc_genotype <- sc %>% pull(as.character(sc_cluster))
     ref_genotype <- ref  %>% pull(refsample)
-    
-    scgen <- lapply(sc_genotype, doSum) %>% unlist()
-    refgen <- lapply(ref_genotype, doSum) %>% unlist()
-    
-    counts[refsample, as.character(sc_cluster)] <- sum(na.omit(scgen == refgen))
+
+    # scgen <- lapply(sc_genotype, doSum) %>% unlist()
+    # refgen <- lapply(ref_genotype, doSum) %>% unlist()
+
+    counts[refsample, as.character(sc_cluster)] <- sum(
+      na.omit(
+        newvals[ref_genotype] %>% unname(),
+        newvals[sc_genotype] %>% unname()
+      )
+    )
     
   }
 }
@@ -88,22 +94,22 @@ library(outliers)
 
 doGrubss <- function(v) {
   if (var(v) == 0) {return(list('p' = NA, 'sample' = NA, 'sig' = NA))} # If there is nog variation in the nr of SNPs being tested whatsoever..
-  
+
   highest.sample <- sort(v, decreasing = T) %>% head(1) %>% names()
 
   # We need to check if we need to apply the opposite argument.
   mean(v) -> m
-  
+
   lapply(v, function(x) {abs(x - m)} ) %>% do.call(rbind, .) %>%
     as.data.frame() %>% set_colnames(c('dev')) %>%
     mutate(test = ifelse(dev == max(dev), 'min', 'other')) %>%
     filter(test == 'min') %>% rownames(.) -> tested.sample
-  
+
   if (length(tested.sample > 1)) {
     tested.sample <- tested.sample[1]
     print('Warning: multiple samples with same nr of SNPs. Testing random first one')
   }
-  
+
   if(tested.sample != highest.sample) {
     opposite = T
   } else {
@@ -142,7 +148,7 @@ dev.off()
 
 # for (sc_cluster in sc_samples) {
 #   for (refsample in refsamples) {
-#     
+#
 #     # Compare all SNPs at the same time
 #     # By comparing this way, all genotypes that are equal between reference and
 #     # souporcell are TRUE (=1), those that dont match are false (=0).
@@ -153,8 +159,8 @@ dev.off()
 #     scgen <- lapply(sc_genotype, doSum) %>% unlist()
 #     refgen <- lapply(ref_genotype, doSum) %>% unlist()
 #     counts2[refsample, as.character(sc_cluster)] <- sum(na.omit(scgen == refgen))
-#     
+#
 #     # counts2[refsample, as.character(sc_cluster)] <- sum(sc_genotype == ref_genotype)
-#     
+#
 #   }
 # }
